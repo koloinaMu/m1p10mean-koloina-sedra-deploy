@@ -118,7 +118,7 @@ app.post('/connexion',jsonParser, function (req,res) {
 	  if(utilisateur.type==1){
 	  	table="SuperAdmin";
 	  }
-	 // console.log(table);
+	  console.log(table);
 	  reponse= dbo.collection(table).findOne(query,  function(err, ress) {
 	    if (err){
 	    	res.send(null);
