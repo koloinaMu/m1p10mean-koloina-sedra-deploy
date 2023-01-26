@@ -25,7 +25,7 @@ var MongoClient=mongo.MongoClient;
  
 // create application/x-www-form-urlencoded parser
 var urlencodedParser = bodyParser.urlencoded({ extended: false });
-
+var router=express.Router();
 
 /*
 app.get('/',  (req,res) => {
@@ -82,7 +82,7 @@ function convertDizaine(chiffre) {
 	else return chiffre;
 }
 
-app.post('/inscription',jsonParser,function (req,res) {
+router.post('/inscription',jsonParser,function (req,res) {
 	var utilisateur=req.body;
 	MongoClient.connect(uri, function(err, db) {
 	  if (err) throw err;
@@ -105,7 +105,7 @@ app.post('/inscription',jsonParser,function (req,res) {
 	}); 
 });
 
-app.post('/connexion',jsonParser, function (req,res) {
+router.post('/connexion',jsonParser, function (req,res) {
 	var utilisateur=req.body;
 	MongoClient.connect(uri, function(err, db) {
 	  if (err) throw err;
@@ -127,7 +127,7 @@ app.post('/connexion',jsonParser, function (req,res) {
 	}); 
 });
 
-app.post('/update',jsonParser, function (req,res) {
+router.post('/update',jsonParser, function (req,res) {
 	var utilisateur=req.body;
 	MongoClient.connect(uri, function(err, db) {
 	  if (err) throw err;
@@ -170,7 +170,7 @@ app.post('/update',jsonParser, function (req,res) {
 });
 
 
-app.get('/utilisateurs',function(req,res) {
+router.get('/utilisateurs',function(req,res) {
 	MongoClient.connect(uri,function (err,db) {
 		if(err) throw err;
 		var dbo=db.db("mongomean");
@@ -181,7 +181,7 @@ app.get('/utilisateurs',function(req,res) {
 	})
 });
 
-app.post('/depot-voiture',jsonParser,function (req,res) {
+router.post('/depot-voiture',jsonParser,function (req,res) {
 	var depot=req.body;
 	MongoClient.connect(uri, function(err, db) {
 	  if (err) throw err;
@@ -210,14 +210,14 @@ app.post('/depot-voiture',jsonParser,function (req,res) {
 			  });
 			}else{
 				db.close();
-				res.send("Votre voiture est au garage");
+				res.send('null');
 			}
 	  });	  
 
 	}); 
 });
 
-app.post('/reparations-courantes',jsonParser,function(req,res) {
+router.post('/reparations-courantes',jsonParser,function(req,res) {
 	var utilisateur=req.body;
 	MongoClient.connect(uri,function (err,db) {
 		if(err) throw err;
@@ -239,7 +239,7 @@ app.post('/reparations-courantes',jsonParser,function(req,res) {
 
 // atelier----------------------------------------------------------------------
 
-app.post('/receptionner_vehicule/:id',jsonParser, function (req,res) {
+router.post('/receptionner_vehicule/:id',jsonParser, function (req,res) {
 	var depot=req.body;
 	//console.log('id '+ depot._id);
 	var id=req.params.id;
@@ -261,7 +261,7 @@ app.post('/receptionner_vehicule/:id',jsonParser, function (req,res) {
 	}); 
 });
 
-app.get('/les_depots',function(req,res) {
+router.get('/les_depots',function(req,res) {
 	//var utilisateur=req.body;
 	MongoClient.connect(uri,function (err,db) {
 		if(err) throw err;
@@ -274,7 +274,7 @@ app.get('/les_depots',function(req,res) {
 	})
 });
 
-app.get('/dans_atelier',function(req,res) {
+router.get('/dans_atelier',function(req,res) {
 	//var utilisateur=req.body;
 	MongoClient.connect(uri,function (err,db) {
 		if(err) throw err;
@@ -289,7 +289,7 @@ app.get('/dans_atelier',function(req,res) {
 });
 
 
-app.post('/modifier_avancement/:avancement/:idReparation/:idDepot',jsonParser, function (req,res) {
+router.post('/modifier_avancement/:avancement/:idReparation/:idDepot',jsonParser, function (req,res) {
 	var depot=req.body;
 	//console.log('id '+ depot._id);
 	var idDepot=req.params.idDepot;
@@ -319,7 +319,7 @@ app.post('/modifier_avancement/:avancement/:idReparation/:idDepot',jsonParser, f
 
 
 //-------------------------------------------------
-app.post('/ajouterreparationchoisissez/:idDepot/:idReparation/:nom/:prix',jsonParser, function (req,res) {
+router.post('/ajouterreparationchoisissez/:idDepot/:idReparation/:nom/:prix',jsonParser, function (req,res) {
 	var depot=req.body;
 	//console.log('id '+ depot._id);
 	var idDepot=req.params.idDepot;
@@ -350,7 +350,7 @@ app.post('/ajouterreparationchoisissez/:idDepot/:idReparation/:nom/:prix',jsonPa
 
 
 
-app.get('/reparation_prix',function(req,res) {
+router.get('/reparation_prix',function(req,res) {
 	MongoClient.connect(uri,function (err,db) {
 		if(err) throw err;
 		var dbo=db.db("mongomean");
@@ -361,7 +361,7 @@ app.get('/reparation_prix',function(req,res) {
 	})
 });
 
-app.post('/bonSortie/:id',jsonParser, function (req,res) {
+router.post('/bonSortie/:id',jsonParser, function (req,res) {
 	var depot=req.body;
 	//console.log('id '+ depot._id);
 	var id=req.params.id;
@@ -383,7 +383,7 @@ app.post('/bonSortie/:id',jsonParser, function (req,res) {
 	}); 
 });
 
-app.post('/recuperer_voiture/:id',jsonParser, function (req,res) {
+router.post('/recuperer_voiture/:id',jsonParser, function (req,res) {
 	var depot=req.body;
 	//console.log('id '+ depot._id);
 	var id=req.params.id;
@@ -407,7 +407,7 @@ app.post('/recuperer_voiture/:id',jsonParser, function (req,res) {
 
 
 
-app.post('/facturation',jsonParser,function(req,res) {
+router.post('/facturation',jsonParser,function(req,res) {
 	var mail=req.body;
 	//id= utilisateur._id;
 	//console.log(id);
@@ -424,7 +424,7 @@ app.post('/facturation',jsonParser,function(req,res) {
 });
 
 
-app.post('/recherche',jsonParser,function(req,res) {
+router.post('/recherche',jsonParser,function(req,res) {
 	var aPropos=req.body;
 	var voiture={};
 	var requete='';	
@@ -448,7 +448,7 @@ app.post('/recherche',jsonParser,function(req,res) {
 	})
 });
 
-app.post('/sortieVoiture',jsonParser, function (req,res) {
+router.post('/sortieVoiture',jsonParser, function (req,res) {
 	var depot=req.body;
 	//console.log(depot);
 	MongoClient.connect(uri, function(err, db) {
@@ -466,7 +466,7 @@ app.post('/sortieVoiture',jsonParser, function (req,res) {
 	}); 
 });
 
-app.get('/depotVoitureJour', function (req,res) {
+router.get('/depotVoitureJour', function (req,res) {
 	var depot=req.body;
 	//console.log(depot);
 	MongoClient.connect(uri, function(err, db) {
@@ -494,7 +494,7 @@ app.get('/depotVoitureJour', function (req,res) {
 	}); 
 });
 
-app.post('/paiement',jsonParser,function(req,res) {
+router.post('/paiement',jsonParser,function(req,res) {
 	var paiement=req.body;
 	console.log(paiement);
 	MongoClient.connect(uri, function(err, db) {
@@ -519,7 +519,7 @@ app.post('/paiement',jsonParser,function(req,res) {
 	}); 
 });
 
-app.get('/factures-non-reglees',function(req,res) {
+router.get('/factures-non-reglees',function(req,res) {
 	MongoClient.connect(uri,function (err,db) {
 		if(err) throw err;
 		var dbo=db.db("mongomean");
@@ -532,7 +532,7 @@ app.get('/factures-non-reglees',function(req,res) {
 	})
 });
 
-app.post('/validerPaiement',jsonParser,function(req,res) {
+router.post('/validerPaiement',jsonParser,function(req,res) {
 	var paiement=req.body;
 	console.log(paiement);
 	MongoClient.connect(uri, function(err, db) {
@@ -566,7 +566,7 @@ app.post('/validerPaiement',jsonParser,function(req,res) {
 	}); 
 });
 
-app.post('/chiffreAffaire',jsonParser,function(req,res){
+router.post('/chiffreAffaire',jsonParser,function(req,res){
 	var condition=req.body;
 	console.log(condition);
 	if(condition.option=='Mois'){
@@ -686,7 +686,7 @@ app.post('/chiffreAffaire',jsonParser,function(req,res){
 	}
 });
 
-app.get('/tmpsReparationsMoyens',function(req,res){
+router.get('/tmpsReparationsMoyens',function(req,res){
 	MongoClient.connect(uri,function (err,db) {
 		if(err) throw err;
 		var dbo=db.db("mongomean");
@@ -751,7 +751,7 @@ app.get('/tmpsReparationsMoyens',function(req,res){
 	})
 });
 
-app.post('/depenser',jsonParser,function (req,res) {
+router.post('/depenser',jsonParser,function (req,res) {
 	var depot=req.body;
 	MongoClient.connect(uri, function(err, db) {
 	  if (err) throw err;
@@ -769,7 +769,7 @@ app.post('/depenser',jsonParser,function (req,res) {
 	}); 
 });
 
-app.get('/beneficeMensuel',function(req,res){
+router.get('/beneficeMensuel',function(req,res){
 	MongoClient.connect(uri,function(err,db) {
 			if (err) throw err;
 	  		var dbo = db.db("mongomean");
@@ -848,7 +848,7 @@ app.get('/beneficeMensuel',function(req,res){
 		})
 });
 
-app.post('/voitureUtilisateur',jsonParser,function(req,res){
+router.post('/voitureUtilisateur',jsonParser,function(req,res){
 	//var utilisateur={"_id":"63cfedd75145130f76f92781","id":"","nom":"kolo2","prenom":"kolo2","mail":"rabenjako@gmail.com","mdp":"7018ed17bd6407ff268c7b250d36fa3a","voiture":{"id":"","immatriculation":"9876TAD","couleur":"Noir"},"type":0,"etat":1};
 	//var historiques=await historiqueVoitureUtilisateur(utilisateur,res);
 	var utilisateur=req.body;
@@ -884,7 +884,7 @@ app.post('/voitureUtilisateur',jsonParser,function(req,res){
 	});
 });
 
-app.post('/historiqueVoiture',jsonParser,function(req,res){
+router.post('/historiqueVoiture',jsonParser,function(req,res){
 	var voiture=req.body;
 	//var voiture={ id: '', immatriculation: '9876TAD', couleur: 'Gris' };
 	console.log(voiture);
@@ -930,6 +930,8 @@ app.post('/historiqueVoiture',jsonParser,function(req,res){
  		});
 	});
 });
+
+app.use('/node',router);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT,function () {
