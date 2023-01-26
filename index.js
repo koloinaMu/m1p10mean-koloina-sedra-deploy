@@ -25,61 +25,58 @@ var MongoClient=mongo.MongoClient;
  
 // create application/x-www-form-urlencoded parser
 var urlencodedParser = bodyParser.urlencoded({ extended: false });
-/*
-app.get('/',function (req,res) {
-	
-	MongoClient.connect(uri,function(err,db) {
-			if (err) throw err;
-	  		var dbo = db.db("mongomean");
 
-			dbo.collection("DepotVoiture").aggregate(
-			 [ 
-		 	{
-		 		$match: {
-		 			"utilisateur":{"_id":"63cfedd75145130f76f92781","id":"","nom":"kolo2","prenom":"kolo2","mail":"rabenjako@gmail.com","mdp":"7018ed17bd6407ff268c7b250d36fa3a","voiture":{"id":"","immatriculation":"9876TAD","couleur":"Noir"},"type":0,"etat":1}
-		 		}
-		 	},
-		 	{
-				$unwind: "$voiture"
-			},		 	
-		 	{ 
-		 		$group : {
-		 		 _id :  {voiture:"$voiture",depot:"$dateDepot"} ,
-		 		 reparation: { $push: "$reparations" }
-		 		}
-		 	},
-		 	{
-		 		$addFields:
-		 		{
-				    "reparations": {
-				      "$reduce": {
-				        "input": "$reparation",
-				        "initialValue": [],
-				        "in": { "$concatArrays": [ "$$value", "$$this" ] }
-				      }
-				    }
-				}
-		 	},
-		 	{
-		 		$sort: {
-		 			'_id.depot':1
-		 		}
-		 	}
-		 ] 
-			 ).toArray(function (err,ress) {
-			 	if(err) throw err;
-			 	//console.log(ress);
-			 	var voitures=[];
-			 	for(var i=0;i<ress.length;i++){
-			 		//console.log(ress[i]._id.voiture);
-			 		voitures.push(ress[i]._id.voiture);
-			 	}
-				db.close();
-				res.send(ress);
-			});
-		})
-});
-*/
+
+/*
+app.get('/',  (req,res) => {
+	//var voiture=req.body;
+	var voiture={ id: '', immatriculation: '9876TAD', couleur: 'Gris' };
+	console.log(voiture);
+	var query=[ 
+	 	{
+	 		$match: {
+	 			voiture:voiture
+	 		}
+	 	},
+	 	{
+	 		$project: {
+	 			dateDepot:1,
+	 			reparations:1
+	 		}
+	 	},
+	 	{
+	 		$sort: { dateDepot:-1 }
+	 	}
+	 ] ;
+	MongoClient.connect(uri,function(err,db){
+	  	var dbo = db.db("mongomean");
+	  	dbo.collection("DepotVoiture").aggregate(
+ 			query
+ 		).toArray( function(err,ress){
+ 			if(err) throw err;
+ 			console.log(ress);
+ 			var reparations=[];
+ 			var m=0;
+ 			for(var i=0;i<ress.length;i++){
+ 				for(var j=0;j<ress[i].reparations.length;j++){
+ 					var reparation={
+ 						dateDepot:ress[i].dateDepot,
+ 						reparation:ress[i].reparations[j]
+ 					};
+ 					reparations[m]=reparation;
+ 					m++;
+ 				}
+ 			}
+			db.close();
+			res.send(reparations);
+ 			//return voitures;
+ 			//console.log("\n");
+ 		});
+	});
+		
+});*/
+
+
 function convertDizaine(chiffre) {
 	if(chiffre<10) return '0'+chiffre;
 	else return chiffre;
@@ -328,7 +325,7 @@ app.post('/ajouterreparationchoisissez/:idDepot/:idReparation/:nom/:prix',jsonPa
 	var idDepot=req.params.idDepot;
 	var idReparation=req.params.idReparation;
 	var nom=req.params.nom;
-	var prix=req.params.prix;
+	var prix=Number(req.params.prix);
 	MongoClient.connect(uri, function(err, db) {
 	  if (err) throw err;
 	  var dbo = db.db("mongomean");
@@ -849,6 +846,89 @@ app.get('/beneficeMensuel',function(req,res){
 				  });				
 			});
 		})
+});
+
+app.post('/voitureUtilisateur',jsonParser,function(req,res){
+	//var utilisateur={"_id":"63cfedd75145130f76f92781","id":"","nom":"kolo2","prenom":"kolo2","mail":"rabenjako@gmail.com","mdp":"7018ed17bd6407ff268c7b250d36fa3a","voiture":{"id":"","immatriculation":"9876TAD","couleur":"Noir"},"type":0,"etat":1};
+	//var historiques=await historiqueVoitureUtilisateur(utilisateur,res);
+	var utilisateur=req.body;
+	console.log(utilisateur);
+	var query=[ 
+	 	{
+	 		$match: {
+	 			"utilisateur":utilisateur
+	 		}
+	 	},
+	 	{
+			$unwind: "$voiture"
+		},	
+	 	{
+	 		$group: {
+	 			_id: "$voiture"
+	 		}
+	 	}
+	 ] ;
+	MongoClient.connect(uri,function(err,db){
+	  	var dbo = db.db("mongomean");
+	  	dbo.collection("DepotVoiture").aggregate(
+ 			query
+ 		).toArray( function(err,ress){
+ 			if(err) throw err;
+ 			console.log(ress);
+ 			console.log(utilisateur);
+			db.close();
+			res.send(ress);
+ 			//return voitures;
+ 			//console.log("\n");
+ 		});
+	});
+});
+
+app.post('/historiqueVoiture',jsonParser,function(req,res){
+	var voiture=req.body;
+	//var voiture={ id: '', immatriculation: '9876TAD', couleur: 'Gris' };
+	console.log(voiture);
+	var query=[ 
+	 	{
+	 		$match: {
+	 			voiture:voiture
+	 		}
+	 	},
+	 	{
+	 		$project: {
+	 			dateDepot:1,
+	 			reparations:1
+	 		}
+	 	},
+	 	{
+	 		$sort: { dateDepot:-1 }
+	 	}
+	 ] ;
+	MongoClient.connect(uri,function(err,db){
+	  	var dbo = db.db("mongomean");
+	  	dbo.collection("DepotVoiture").aggregate(
+ 			query
+ 		).toArray( function(err,ress){
+ 			if(err) throw err;
+ 			console.log(ress);
+ 			var reparations=[];
+ 			var m=0;
+ 			for(var i=0;i<ress.length;i++){
+ 				for(var j=0;j<ress[i].reparations.length;j++){
+ 					var reparation={
+ 						dateDepot:ress[i].dateDepot,
+ 						reparation:ress[i].reparations[j]
+ 					};
+ 					reparations[m]=reparation;
+ 					m++;
+ 				}
+ 			}
+			db.close();
+			res.send(reparations);
+ 			//return voitures;
+ 			//console.log("\n");
+ 		});
+	});
 });
 
 const PORT = process.env.PORT || 3000;
