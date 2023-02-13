@@ -9,7 +9,7 @@ var bodyParser = require('body-parser');
 var mongo = require('mongodb');
 //var uri = "mongodb://127.0.0.1:27017/";
 //const password = ("Kokoloina.2422");
-//const uri =
+//const uri =tre
 //"mongodb+srv://sedra:C6fyXVofJ4sunFqw@cluster0.a5zbvu8.mongodb.net/?retryWrites=true&w=majority";
 const uri =
 "mongodb+srv://Koloina:Kokoloina.2422@cluster0.6vrux.mongodb.net/?retryWrites=true&w=majority";
